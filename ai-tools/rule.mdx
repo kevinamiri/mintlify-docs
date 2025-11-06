@@ -1,0 +1,165 @@
+
+---
+title: "10 Rules for Technical Writing setup"
+description: "10 Rules for Technical Writing"
+icon: "arrow-pointer"
+---
+
+10 Rules for Technical Writing
+
+```bash
+mkdir -p .cursor
+```
+
+Create `.cursor/rules.md`:
+
+````markdown
+# Mintlify technical writing rule
+
+AI assistant for technical documentation using Mintlify components.
+
+## Core principles
+
+### Language & style
+- Clear, direct technical language
+- Second person for instructions
+- Active voice, present tense
+- Define jargon on first use
+- Consistent terminology
+- Concise with context
+- Parallel structure
+
+### Content organization
+- Critical information first
+- Basic before advanced
+- Numbered procedures
+- Prerequisites before instructions
+- Expected outcomes per step
+- Descriptive headings
+- Logical grouping
+
+### User-centered
+- Focus on outcomes
+- Anticipate questions
+- Troubleshoot failures
+- Scannable structure
+- Verification steps
+
+## Mintlify components
+
+### Callouts
+
+<Note>Supporting content</Note>
+<Tip>Best practices</Tip>
+<Warning>Critical cautions</Warning>
+<Info>Contextual information</Info>
+<Check>Success confirmations</Check>
+
+### Code
+
+**Single block**
+```javascript config.js
+const apiConfig = {
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+  headers: { Authorization: `Bearer ${process.env.API_TOKEN}` }
+};
+```
+
+**Multi-language**
+<CodeGroup>
+```javascript Node.js
+await fetch('/api/endpoint', {
+  headers: { Authorization: `Bearer ${apiKey}` }
+});
+```
+```python Python
+requests.get('/api/endpoint', 
+  headers={'Authorization': f'Bearer {api_key}'})
+```
+</CodeGroup>
+
+**Request/response**
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.example.com/users' \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "John", "email": "john@example.com"}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{"id": "user_123", "name": "John", "created_at": "2024-01-15T10:30:00Z"}
+```
+</ResponseExample>
+
+### Structure
+
+**Steps**
+<Steps>
+<Step title="Install">Run `npm install`</Step>
+<Step title="Configure">Create `.env` with credentials</Step>
+</Steps>
+
+**Tabs**
+<Tabs>
+<Tab title="macOS">`brew install node`</Tab>
+<Tab title="Windows">`choco install nodejs`</Tab>
+</Tabs>
+
+**Accordions**
+<AccordionGroup>
+<Accordion title="Troubleshooting">Connection issues and fixes</Accordion>
+</AccordionGroup>
+
+### Cards
+
+<Card title="Getting started" icon="rocket" href="/quickstart">
+Installation to first API call in 10 minutes
+</Card>
+
+<CardGroup cols={2}>
+<Card title="Authentication" icon="key" href="/auth">API keys or JWT</Card>
+<Card title="Rate limiting" icon="clock" href="/rate-limits">Usage patterns</Card>
+</CardGroup>
+
+### API
+
+**Parameters**
+<ParamField path="user_id" type="string" required>
+UUID v4 format
+</ParamField>
+
+**Responses**
+<ResponseField name="user_id" type="string" required>
+Created user identifier
+</ResponseField>
+
+**Nested**
+<ResponseField name="user" type="object">
+<Expandable title="Properties">
+<ResponseField name="first_name" type="string">Registration name</ResponseField>
+</Expandable>
+</ResponseField>
+
+### Media
+
+**Images**
+<Frame>
+<img src="/images/dashboard.png" alt="Dashboard analytics" />
+</Frame>
+
+**Video**
+<video controls className="w-full aspect-video rounded-xl" src="link.com"></video>
+
+**YouTube**
+<iframe className="w-full aspect-video rounded-xl" src="https://youtube.com/embed/ID"></iframe>
+
+**Tooltips**
+<Tooltip tip="Application Programming Interface">API</Tooltip>
+
+**Updates**
+<Update label="v2.1.0" description="March 15, 2024">
+New features and bug fixes
+</Update>

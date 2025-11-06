@@ -3,74 +3,290 @@ title: "Claude Code setup"
 description: "Configure Claude Code for your documentation workflow"
 icon: "asterisk"
 ---
-
-Claude Code is Anthropic's official CLI tool. This guide will help you set up Claude Code to help you write and maintain your documentation.
+Configure Cursor to write and maintain documentation using Mintlify components and technical writing best practices.
 
 ## Prerequisites
 
-- Active Claude subscription (Pro, Max, or API access)
+- Cursor editor
+- Documentation repository access
 
-## Setup
+## Project rules
 
-1. Install Claude Code globally:
+Create shared rules for team members in repository root:
 
-  ```bash
-  npm install -g @anthropic-ai/claude-code
+```bash
+mkdir -p .cursor
 ```
 
-2. Navigate to your docs directory.
-3. (Optional) Add the `CLAUDE.md` file below to your project.
-4. Run `claude` to start.
-
-## Create `CLAUDE.md`
-
-Create a `CLAUDE.md` file at the root of your documentation repository to train Claude Code on your specific documentation standards:
+Create `.cursor/rules.md`:
 
 ````markdown
-# Mintlify documentation
+# Mintlify technical writing rule
 
-## Working relationship
-- You can push back on ideas-this can lead to better documentation. Cite sources and explain your reasoning when you do so
-- ALWAYS ask for clarification rather than making assumptions
-- NEVER lie, guess, or make up information
+AI assistant specialized in technical documentation using Mintlify components and industry-standard practices.
 
-## Project context
-- Format: MDX files with YAML frontmatter
-- Config: docs.json for navigation, theme, settings
-- Components: Mintlify components
+## Core principles
 
-## Content strategy
-- Document just enough for user success - not too much, not too little
-- Prioritize accuracy and usability of information
-- Make content evergreen when possible
-- Search for existing information before adding new content. Avoid duplication unless it is done for a strategic reason
-- Check existing patterns for consistency
-- Start by making the smallest reasonable changes
+### Language & style
 
-## Frontmatter requirements for pages
-- title: Clear, descriptive page title
-- description: Concise summary for SEO/navigation
+- Clear, direct language for technical audiences
+- Second person ("you") for instructions
+- Active voice, present tense
+- Define jargon on first use
+- Consistent terminology
+- Concise sentences with context
+- Parallel structure in lists and headings
 
-## Writing standards
-- Second-person voice ("you")
-- Prerequisites at start of procedural content
-- Test all code examples before publishing
-- Match style and formatting of existing pages
-- Include both basic and advanced use cases
-- Language tags on all code blocks
-- Alt text on all images
-- Relative paths for internal links
+### Content organization
 
-## Git workflow
-- NEVER use --no-verify when committing
-- Ask how to handle uncommitted changes before starting
-- Create a new branch when no clear branch exists for changes
-- Commit frequently throughout development
-- NEVER skip or disable pre-commit hooks
+- Lead with critical information
+- Basic before advanced concepts
+- Numbered steps for procedures
+- Prerequisites before instructions
+- Expected outcomes per step
+- Descriptive, keyword-rich headings
+- Logical grouping with clear sections
 
-## Do not
-- Skip frontmatter on any MDX file
-- Use absolute URLs for internal links
-- Include untested code examples
-- Make assumptions - always ask for clarification
-````
+### User-centered
+
+- Focus on goals and outcomes
+- Anticipate and address questions
+- Troubleshoot likely failures
+- Scannable: headings, lists, whitespace
+- Verification steps for success
+
+## Mintlify components
+
+### 🔔 Callout components
+
+**Note** - Supplementary information
+
+<Note>
+Supporting content without flow interruption
+</Note>
+
+**Tip** - Best practices
+
+<Tip>
+Expert advice, shortcuts, optimization techniques
+</Tip>
+
+**Warning** - Critical cautions
+
+<Warning>
+Potential issues, breaking changes, destructive actions
+</Warning>
+
+**Info** - Contextual information
+
+<Info>
+Background context, neutral announcements
+</Info>
+
+**Check** - Success confirmations
+
+<Check>
+Positive confirmations, completions, achievements
+</Check>
+
+### 💻 Code components
+
+**Single block**
+
+```javascript config.js
+const apiConfig = {
+  baseURL: 'https://api.example.com',
+  timeout: 5000,
+  headers: { Authorization: `Bearer ${process.env.API_TOKEN}` }
+};
+```
+
+**Multi-language group**
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch('/api/endpoint', {
+  headers: { Authorization: `Bearer ${apiKey}` }
+});
+```
+
+```python Python
+import requests
+response = requests.get('/api/endpoint', 
+  headers={'Authorization': f'Bearer {api_key}'})
+```
+
+```curl cURL
+curl -X GET '/api/endpoint' \
+  -H 'Authorization: Bearer YOUR_API_KEY'
+```
+</CodeGroup>
+
+**Request/response**
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.example.com/users' \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "John Doe", "email": "john@example.com"}'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{
+  "id": "user_123",
+  "name": "John Doe", 
+  "email": "john@example.com",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+</ResponseExample>
+
+### 📋 Structural components
+
+**Steps** - Sequential procedures
+
+<Steps>
+<Step title="Install dependencies">
+Run `npm install` for required packages.
+
+<Check>
+Verify: `npm list`
+</Check>
+</Step>
+
+<Step title="Configure environment">
+Create `.env` with API credentials.
+
+```bash
+API_KEY=your_api_key_here
+```
+
+<Warning>
+Never commit API keys to version control
+</Warning>
+</Step>
+</Steps>
+
+**Tabs** - Alternative content
+
+<Tabs>
+<Tab title="macOS">
+```bash
+brew install node
+npm install -g package-name
+```
+</Tab>
+
+<Tab title="Windows">
+```powershell
+choco install nodejs
+npm install -g package-name
+```
+</Tab>
+
+<Tab title="Linux">
+```bash
+sudo apt install nodejs npm
+npm install -g package-name
+```
+</Tab>
+</Tabs>
+
+**Accordions** - Collapsible content
+
+<AccordionGroup>
+<Accordion title="Troubleshooting connections">
+- **Firewall**: Open ports 80, 443
+- **Proxy**: Set HTTP_PROXY environment variable
+- **DNS**: Try 8.8.8.8 as DNS server
+</Accordion>
+
+<Accordion title="Advanced configuration">
+```javascript
+const config = {
+  performance: { cache: true, timeout: 30000 },
+  security: { encryption: 'AES-256' }
+};
+```
+</Accordion>
+</AccordionGroup>
+
+### 🎯 Cards & columns
+
+**Single card**
+
+<Card title="Getting started guide" icon="rocket" href="/quickstart">
+Installation to first API call in under 10 minutes
+</Card>
+
+**Card group**
+
+<CardGroup cols={2}>
+<Card title="Authentication" icon="key" href="/auth">
+Authenticate using API keys or JWT tokens
+</Card>
+
+<Card title="Rate limiting" icon="clock" href="/rate-limits">
+Rate limits and high-volume usage patterns
+</Card>
+</CardGroup>
+
+### 🔌 API documentation
+
+**Parameter fields**
+
+<ParamField path="user_id" type="string" required>
+Unique identifier. UUID v4 format
+</ParamField>
+
+<ParamField body="email" type="string" required>
+User email. Valid and unique
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Max results. Range: 1-100
+</ParamField>
+
+<ParamField header="Authorization" type="string" required>
+Bearer token. Format: `Bearer YOUR_API_KEY`
+</ParamField>
+
+**Response fields**
+
+<ResponseField name="user_id" type="string" required>
+Unique identifier for created user
+</ResponseField>
+
+<ResponseField name="created_at" type="timestamp">
+ISO 8601 creation timestamp
+</ResponseField>
+
+<ResponseField name="permissions" type="array">
+Assigned permission strings
+</ResponseField>
+
+**Nested fields**
+
+<ResponseField name="user" type="object">
+Complete user object with data
+
+<Expandable title="User properties">
+<ResponseField name="profile" type="object">
+Profile information and details
+
+<Expandable title="Profile details">
+<ResponseField name="first_name" type="string">
+First name from registration
+</ResponseField>
+
+<ResponseField name="avatar_url" type="string | null">
+Profile picture URL. Null if unset
+</ResponseField>
+</Expandable>
+</ResponseField>
+</Expandable>
+</ResponseField>
+
+### 
