@@ -1,216 +1,114 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Text to Speech API",
+    "version": "1.1.8"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://speech.maila.ai"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/api/speech/create": {
+      "post": {
+        "operationId": "convertTextToSpeech",
+        "summary": "Convert text to speech",
+        "x-openai-isConsequential": false,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "input": {
+                    "type": "string",
+                    "description": "The spoken text to be converted to speech as a string."
+                  },
+                  "locale": {
+                    "type": "string",
+                    "description": "The locale of the text, following the BCP-47 format.",
+                    "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{1,8})*$"
+                  },
+                  "gender": {
+                    "type": "string",
+                    "enum": ["male", "female"],
+                    "default": "male",
+                    "description": "The gender of the narrator as a string."
+                  },
+                  "narratorName": {
+                    "type": "string",
+                    "default": "auto",
+                    "description": "The name of the narrator by whom the audio should be created. The name must be same during the conversation unless the user asks for a different name. If no narrator name is provided by user, then use 'auto' to automatically select the suitable narrator name."
+                  },
+                  "age": {
+                    "type": "string",
+                    "enum": ["young-adult", "middle-aged", "senior"],
+                    "description": "The age group of the narrator."
+                  },
+                  "category": {
+                    "type": "string",
+                    "enum": ["storytelling", "character_animation", "social_media", "advertisement", "broadcast", "e-learning", "conversationl", "documentary" ],
+                    "description": "The speaking style and tone for the generated speech audio."
+                  },
+                  "timbre": {
+                    "type": "string",
+                    "description": "Describe the timbre or color of the voice that will best suit the context."
+                  },
+                  "instructions": {
+                    "type": "string",
+                    "description": "Detailed specific instructions on how the text should be read, including rhythm, accent, timbre, delivery style, emotional palette, vocal features, emphasis, tone variations and other nuanced speech characteristics."
+                  },
+                  "delivery_style": {
+                    "type": "string",
+                    "enum": ["formal", "balanced", "engaging", "performed"],
+                    "description": "The delivery style of the speech."
+                  },
+                  "extra_tips": {
+                    "type": "string",
+                    "description": "Any other style notes or tips for the speech."
+                  }
+                },
+                "required": ["input", "locale", "gender", "narratorName", "category", "timbre", "instructions"]
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
+                  "type": "object",
+                  "properties": {
+                    "link": {
+                      "type": "string",
+                      "description": "The URL of the audio file."
+                    },
+                    "note": {
+                      "type": "string",
+                      "description": "Any notes about the audio link file."
+                    }
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Authentication Required"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "description": "The server is temporarily unavailable to handle your request. Please try again later."
           }
         }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Plant"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
-      "post": {
-        "description": "Information about a new plant added to the store",
-        "requestBody": {
-          "description": "Plant added to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
-        "type": "object",
-        "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "message": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
       }
     }
   }
