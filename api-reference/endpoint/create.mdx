@@ -1,4 +1,154 @@
 ---
-title: 'Create Plant'
-openapi: 'POST /plants'
+title: 'Create Speech'
+openapi: 'POST /api/audio/speech'
 ---
+# Audio Endpoints Documentation
+
+The codebase contains two audio synthesis endpoints:
+- `/api/audio/speech` - Main TTS endpoint supporting REST and streaming modes
+- `/api/audio/speech/sse` - Dedicated SSE streaming endpoint
+
+## Overview
+
+The Audio Synthesis API provides text-to-speech (TTS) capabilities using Google Cloud's Chirp voice cloning technology with Gemini voices. The API supports both REST and Server-Sent Events (SSE) streaming modes.
+
+**Base URL**: `${NEXT_PUBLIC_BASE_URL}`
+
+**Version**: 1.0.0
+
+---
+
+## Authentication
+
+All audio endpoints require API key authentication.
+
+### Headers
+
+```http
+X-API-Key: sk_live_your_api_key_here
+Content-Type: application/json
+```
+
+### Getting an API Key
+
+1. Authenticate with OAuth at `/oauth/get-key`
+2. Create an API key at `/api/auth/api-keys`
+3. Save the key securely (shown only once)
+
+### Authentication Errors
+
+| Status | Error | Description |
+|--------|-------|-------------|
+| 401 | `invalid_api_key` | API key missing or malformed |
+| 401 | `invalid_api_key` | API key not found or revoked |
+| 403 | `insufficient_scope` | API key lacks required scopes |
+| 429 | `rate_limit_exceeded` | Too many requests |
+
+---
+
+## Endpoints
+
+### 1. REST Speech Synthesis
+
+**POST** `/api/audio/speech`
+
+Synthesize speech from text using a specified voice. Returns either a public URL or audio buffer.
+
+#### Request Body
+
+```typescript
+interface SynthRequest {
+  voice_id: string;              // Required: Voice identifier from voices database
+  text?: string;                 // Required for REST method: Text to synthesize
+  text_chunks?: string[];        // Required for streaming: Array of text segments
+  sample_rate?: number;          // Optional: Audio sample rate (default: 44100)
+  language_code?: string;        // Optional: Language code (default: 'en-US')
+  method?: 'rest' | 'streaming'; // Optional: Synthesis method (default: 'rest')
+  return_format?: 'url' | 'buffer'; // Optional: Return type (default: 'url')
+  output_format?: 'wav' | 'pcm' | 'mp3'; // Optional: Audio format (default: 'wav')
+  speaking_rate?: number;        // Optional: Speech speed (default: 1.0)
+}
+```
+
+#### REST Method Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `voice_id` | string | ✓ | - | Voice identifier from database |
+| `text` | string | ✓ | - | Text to synthesize (max ~5000 chars) |
+| `sample_rate` | number | ✗ | 44100 | Sample rate in Hz (24000, 44100, 48000) |
+| `language_code` | string | ✗ | 'en-US' | BCP-47 language code |
+| `method` | string | ✗ | 'rest' | Must be 'rest' for this mode |
+| `return_format` | string | ✗ | 'url' | 'url' for public link, 'buffer' for binary |
+| `output_format` | string | ✗ | 'wav' | Audio format: 'wav', 'pcm', 'mp3' |
+
+#### Response (URL Mode)
+
+```typescript
+{
+  status: 'success';
+  audio_url: string;          // Public URL to audio file
+  voice_name: string;         // Voice name used
+  method: 'rest';
+  chars: number;              // Character count
+  format: 'wav' | 'pcm' | 'mp3';
+}
+```
+
+#### Response (Buffer Mode)
+
+**Content-Type**: `audio/wav` | `audio/pcm` | `audio/mpeg`
+
+**Headers**:
+- `Content-Disposition`: `attachment; filename={id}.{format}`
+- `X-Voice`: Voice name
+- `X-Method`: 'rest'
+- `X-Chars`: Character count
+- `X-Format`: Output format
+
+Binary audio data in response body.
+
+#### Example: URL Mode
+
+```bash
+curl -X POST /api/audio/speech \
+  -H "X-API-Key: sk_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voice_id": "voice_123",
+    "text": "Hello, this is a test of text to speech synthesis.",
+    "method": "rest",
+    "return_format": "url",
+    "output_format": "wav",
+    "sample_rate": 44100,
+    "language_code": "en-US"
+  }'
+```
+
+**Response**:
+```json
+{
+  "status": "success",
+  "audio_url": "https://storage.googleapis.com/bucket/path/audio.wav",
+  "voice_name": "lily",
+  "method": "rest",
+  "chars": 51,
+  "format": "wav"
+}
+```
+
+#### Example: Buffer Mode
+
+```bash
+curl -X POST https://your-domain.com/api/audio/speech \
+  -H "X-API-Key: sk_live_abc123..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "voice_id": "voice_123",
+    "text": "Download this audio directly.",
+    "method": "rest",
+    "return_format": "buffer",
+    "output_format": "mp3"
+  }' \
+  --output speech.mp3
+```
